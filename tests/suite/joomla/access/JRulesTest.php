@@ -274,6 +274,7 @@ class JRulesTest extends PHPUnit_Framework_TestCase
 		$rules		= new JRules($array1);
 		$allowed	= $rules->getAllowed(-42);
 
+
 		$this->assertThat(
 			$result,
 			$this->equalTo($allowed)

@@ -50,7 +50,7 @@ class JTreeTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * @todo Implement addChild().
+	 * Test JTree::addChild().
 	 */
 	public function testAddChild() {
 		// Remove the following lines when you implement this test.

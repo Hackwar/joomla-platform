@@ -317,9 +317,9 @@ class JControllerTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 * Test JController::getTask().
-	 * 
+	 *
 	 * @return  void
-	 * 
+	 *
 	 * @since   11.3
 	 */
 	public function testGetTask()
