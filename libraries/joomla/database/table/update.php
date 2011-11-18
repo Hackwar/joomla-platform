@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.database.table');
 
@@ -22,11 +22,9 @@ jimport('joomla.database.table');
 class JTableUpdate extends JTable
 {
 	/**
-	 * Contructor
+	 * Constructor
 	 *
 	 * @param   database  &$db  A database connector object
-	 *
-	 * @return  JTableUpdate
 	 *
 	 * @since   11.1
 	 */
@@ -94,10 +92,10 @@ class JTableUpdate extends JTable
 	 *
 	 * @since   11.1
 	 */
-	function find($options = Array())
+	function find($options = array())
 	{
 		$dbo = JFactory::getDBO();
-		$where = Array();
+		$where = array();
 		foreach ($options as $col => $val)
 		{
 			$where[] = $col . ' = ' . $dbo->Quote($val);

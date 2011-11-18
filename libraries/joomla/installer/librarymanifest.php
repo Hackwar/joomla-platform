@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.filesystem.file');
 
@@ -88,7 +88,7 @@ class JLibraryManifest extends JObject
 	/**
 	 * @var string[] filelist List of files in the library
 	 */
-	var $filelist = Array();
+	var $filelist = array();
 
 	/**
 	 * @var string manifest_file Path to manifest file
@@ -99,8 +99,6 @@ class JLibraryManifest extends JObject
 	 * Constructor
 	 *
 	 * @param   string  $xmlpath  Path to an XML file to load the manifest from.
-	 *
-	 * @return  JLibraryManifest
 	 *
 	 * @since   11.1
 	 */

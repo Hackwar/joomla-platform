@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.application.component.modelform');
 
@@ -73,8 +73,6 @@ abstract class JModelAdmin extends JModelForm
 	 *
 	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
-	 * @return  JModelAdmin
-	 *
 	 * @see     JController
 	 * @since   11.1
 	 */
@@ -86,7 +84,7 @@ abstract class JModelAdmin extends JModelForm
 		{
 			$this->event_after_delete = $config['event_after_delete'];
 		}
-		else if (empty($this->event_after_delete))
+		elseif (empty($this->event_after_delete))
 		{
 			$this->event_after_delete = 'onContentAfterDelete';
 		}
@@ -95,7 +93,7 @@ abstract class JModelAdmin extends JModelForm
 		{
 			$this->event_after_save = $config['event_after_save'];
 		}
-		else if (empty($this->event_after_save))
+		elseif (empty($this->event_after_save))
 		{
 			$this->event_after_save = 'onContentAfterSave';
 		}
@@ -104,7 +102,7 @@ abstract class JModelAdmin extends JModelForm
 		{
 			$this->event_before_delete = $config['event_before_delete'];
 		}
-		else if (empty($this->event_before_delete))
+		elseif (empty($this->event_before_delete))
 		{
 			$this->event_before_delete = 'onContentBeforeDelete';
 		}
@@ -113,7 +111,7 @@ abstract class JModelAdmin extends JModelForm
 		{
 			$this->event_before_save = $config['event_before_save'];
 		}
-		else if (empty($this->event_before_save))
+		elseif (empty($this->event_before_save))
 		{
 			$this->event_before_save = 'onContentBeforeSave';
 		}
@@ -122,7 +120,7 @@ abstract class JModelAdmin extends JModelForm
 		{
 			$this->event_change_state = $config['event_change_state'];
 		}
-		else if (empty($this->event_change_state))
+		elseif (empty($this->event_change_state))
 		{
 			$this->event_change_state = 'onContentChangeState';
 		}
@@ -132,7 +130,7 @@ abstract class JModelAdmin extends JModelForm
 		{
 			$this->text_prefix = strtoupper($config['text_prefix']);
 		}
-		else if (empty($this->text_prefix))
+		elseif (empty($this->text_prefix))
 		{
 			$this->text_prefix = strtoupper($this->option);
 		}
@@ -168,6 +166,29 @@ abstract class JModelAdmin extends JModelForm
 
 		$done = false;
 
+		if (!empty($commands['category_id']))
+		{
+			$cmd = JArrayHelper::getValue($commands, 'move_copy', 'c');
+
+			if ($cmd == 'c')
+			{
+				$result = $this->batchCopy($commands['category_id'], $pks);
+				if (is_array($result))
+				{
+					$pks = $result;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			elseif ($cmd == 'm' && !$this->batchMove($commands['category_id'], $pks))
+			{
+				return false;
+			}
+			$done = true;
+		}
+
 		if (!empty($commands['assetgroup_id']))
 		{
 			if (!$this->batchAccess($commands['assetgroup_id'], $pks))
@@ -178,18 +199,13 @@ abstract class JModelAdmin extends JModelForm
 			$done = true;
 		}
 
-		if (!empty($commands['category_id']))
+		if (!empty($commands['language_id']))
 		{
-			$cmd = JArrayHelper::getValue($commands, 'move_copy', 'c');
+			if (!$this->batchLanguage($commands['language_id'], $pks))
+			{
+				return false;
+			}
 
-			if ($cmd == 'c' && !$this->batchCopy($commands['category_id'], $pks))
-			{
-				return false;
-			}
-			else if ($cmd == 'm' && !$this->batchMove($commands['category_id'], $pks))
-			{
-				return false;
-			}
 			$done = true;
 		}
 
@@ -211,7 +227,7 @@ abstract class JModelAdmin extends JModelForm
 	 * @param   integer  $value  The new value matching an Asset Group ID.
 	 * @param   array    $pks    An array of row IDs.
 	 *
-	 * @return  booelan  True if successful, false otherwise and internal error is set.
+	 * @return  boolean  True if successful, false otherwise and internal error is set.
 	 *
 	 * @since   11.1
 	 */
@@ -253,7 +269,7 @@ abstract class JModelAdmin extends JModelForm
 	 * @param   integer  $value  The new category.
 	 * @param   array    $pks    An array of row IDs.
 	 *
-	 * @return  boolean  True if successful, false otherwise and internal error is set.
+	 * @return  mixed  An array of new IDs on success, boolean false on failure.
 	 *
 	 * @since	11.1
 	 */
@@ -262,7 +278,7 @@ abstract class JModelAdmin extends JModelForm
 		$categoryId = (int) $value;
 
 		$table = $this->getTable();
-		$db = $this->getDbo();
+		$i = 0;
 
 		// Check that the category exists
 		if ($categoryId)
@@ -351,6 +367,55 @@ abstract class JModelAdmin extends JModelForm
 				$this->setError($table->getError());
 				return false;
 			}
+
+			// Get the new item ID
+			$newId = $table->get('id');
+
+			// Add the new ID to the array
+			$newIds[$i]	= $newId;
+			$i++;
+		}
+
+		// Clean the cache
+		$this->cleanCache();
+
+		return $newIds;
+	}
+
+	/**
+	 * Batch language changes for a group of rows.
+	 *
+	 * @param   string  $value  The new value matching a language.
+	 * @param   array   $pks    An array of row IDs.
+	 *
+	 * @return  booelan  True if successful, false otherwise and internal error is set.
+	 *
+	 * @since   11.3
+	 */
+	protected function batchLanguage($value, $pks)
+	{
+		// Check that user has edit permission for items
+		$extension = JRequest::getCmd('option');
+		$user = JFactory::getUser();
+		if (!$user->authorise('core.edit', $extension))
+		{
+			$this->setError(JText::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
+			return false;
+		}
+
+		$table = $this->getTable();
+
+		foreach ($pks as $pk)
+		{
+			$table->reset();
+			$table->load($pk);
+			$table->language = $value;
+
+			if (!$table->store())
+			{
+				$this->setError($table->getError());
+				return false;
+			}
 		}
 
 		// Clean the cache
@@ -365,7 +430,7 @@ abstract class JModelAdmin extends JModelForm
 	 * @param   integer  $value  The new category ID.
 	 * @param   array    $pks    An array of row IDs.
 	 *
-	 * @return  booelan  True if successful, false otherwise and internal error is set.
+	 * @return  boolean  True if successful, false otherwise and internal error is set.
 	 *
 	 * @since	11.1
 	 */
@@ -374,7 +439,6 @@ abstract class JModelAdmin extends JModelForm
 		$categoryId = (int) $value;
 
 		$table = $this->getTable();
-		$db = $this->getDbo();
 
 		// Check that the category exists
 		if ($categoryId)
@@ -503,7 +567,6 @@ abstract class JModelAdmin extends JModelForm
 	public function checkin($pks = array())
 	{
 		// Initialise variables.
-		$user = JFactory::getUser();
 		$pks = (array) $pks;
 		$table = $this->getTable();
 		$count = 0;
@@ -514,7 +577,7 @@ abstract class JModelAdmin extends JModelForm
 		}
 
 		// Check in all items.
-		foreach ($pks as $i => $pk)
+		foreach ($pks as $pk)
 		{
 			if ($table->load($pk))
 			{
@@ -569,7 +632,6 @@ abstract class JModelAdmin extends JModelForm
 	{
 		// Initialise variables.
 		$dispatcher = JDispatcher::getInstance();
-		$user = JFactory::getUser();
 		$pks = (array) $pks;
 		$table = $this->getTable();
 
@@ -728,7 +790,6 @@ abstract class JModelAdmin extends JModelForm
 	protected function populateState()
 	{
 		// Initialise variables.
-		$app = JFactory::getApplication('administrator');
 		$table = $this->getTable();
 		$key = $table->getKeyName();
 
@@ -752,7 +813,7 @@ abstract class JModelAdmin extends JModelForm
 	 */
 	protected function prepareTable(&$table)
 	{
-		// Derived class will provide its own implentation if required.
+		// Derived class will provide its own implementation if required.
 	}
 
 	/**
@@ -833,7 +894,6 @@ abstract class JModelAdmin extends JModelForm
 	public function reorder($pks, $delta = 0)
 	{
 		// Initialise variables.
-		$user = JFactory::getUser();
 		$table = $this->getTable();
 		$pks = (array) $pks;
 		$result = true;
@@ -993,7 +1053,6 @@ abstract class JModelAdmin extends JModelForm
 		// Initialise variables.
 		$table = $this->getTable();
 		$conditions = array();
-		$user = JFactory::getUser();
 
 		if (empty($pks))
 		{
@@ -1012,7 +1071,7 @@ abstract class JModelAdmin extends JModelForm
 				unset($pks[$i]);
 				JError::raiseWarning(403, JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
 			}
-			else if ($table->ordering != $order[$i])
+			elseif ($table->ordering != $order[$i])
 			{
 				$table->ordering = $order[$i];
 

@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
@@ -67,8 +67,6 @@ class JAdapter extends JObject
 	 * @param   string  $classprefix    Class prefix of adapters
 	 * @param   string  $adapterfolder  Name of folder to append to base path
 	 *
-	 * @return  JAdapter  JAdapter object
-	 *
 	 * @since   11.1
 	 */
 	public function __construct($basepath, $classprefix = null, $adapterfolder = null)
@@ -103,7 +101,7 @@ class JAdapter extends JObject
 	 *
 	 * @since   11.1
 	 */
-	public function setAdapter($name, &$adapter = null, $options = Array())
+	public function setAdapter($name, &$adapter = null, $options = array())
 	{
 		if (!is_object($adapter))
 		{
@@ -141,7 +139,7 @@ class JAdapter extends JObject
 	 *
 	 * @since   11.1
 	 */
-	public function getAdapter($name, $options = Array())
+	public function getAdapter($name, $options = array())
 	{
 		if (!array_key_exists($name, $this->_adapters))
 		{

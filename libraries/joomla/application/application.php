@@ -7,12 +7,11 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.application.input');
 jimport('joomla.event.dispatcher');
 jimport('joomla.environment.response');
-jimport('joomla.log.log');
 
 /**
  * Base class for a Joomla! application.
@@ -85,6 +84,12 @@ class JApplication extends JObject
 	public $input = null;
 
 	/**
+	 * @var    array  JApplication instances container.
+	 * @since  11.3
+	 */
+	protected static $instances = array();
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param   array  $config  A configuration array including optional elements such as session
@@ -154,7 +159,7 @@ class JApplication extends JObject
 	 *
 	 * @param   mixed   $client  A client identifier or name.
 	 * @param   array   $config  An optional associative array of configuration settings.
-	 * @param   strong  $prefix  A prefix for class names
+	 * @param   string  $prefix  A prefix for class names
 	 *
 	 * @return  JApplication A JApplication object.
 	 *
@@ -162,14 +167,7 @@ class JApplication extends JObject
 	 */
 	public static function getInstance($client, $config = array(), $prefix = 'J')
 	{
-		static $instances;
-
-		if (!isset($instances))
-		{
-			$instances = array();
-		}
-
-		if (empty($instances[$client]))
+		if (empty(self::$instances[$client]))
 		{
 			// Load the router object.
 			jimport('joomla.application.helper');
@@ -190,10 +188,10 @@ class JApplication extends JObject
 				return $error;
 			}
 
-			$instances[$client] = &$instance;
+			self::$instances[$client] = &$instance;
 		}
 
-		return $instances[$client];
+		return self::$instances[$client];
 	}
 
 	/**
@@ -375,7 +373,7 @@ class JApplication extends JObject
 		if (!preg_match('#^http#i', $url))
 		{
 			$uri = JURI::getInstance();
-			$prefix = $uri->toString(Array('scheme', 'user', 'pass', 'host', 'port'));
+			$prefix = $uri->toString(array('scheme', 'user', 'pass', 'host', 'port'));
 
 			if ($url[0] == '/')
 			{
@@ -385,7 +383,7 @@ class JApplication extends JObject
 			else
 			{
 				// It's relative to where we are now, so lets add that.
-				$parts = explode('/', $uri->toString(Array('path')));
+				$parts = explode('/', $uri->toString(array('path')));
 				array_pop($parts);
 				$path = implode('/', $parts) . '/';
 				$url = $prefix . $path . $url;
@@ -409,7 +407,7 @@ class JApplication extends JObject
 		// so we will output a javascript redirect statement.
 		if (headers_sent())
 		{
-			echo "<script>document.location.href='$url';</script>\n";
+			echo "<script>document.location.href='" . htmlspecialchars($url) . "';</script>\n";
 		}
 		else
 		{
@@ -420,15 +418,15 @@ class JApplication extends JObject
 			if ($navigator->isBrowser('msie') && !utf8_is_ascii($url))
 			{
 				// MSIE type browser and/or server cause issues when url contains utf8 character,so use a javascript redirect method
-				echo '<html><head><meta http-equiv="content-type" content="text/html; charset=' . $document->getCharset() .
-					'" /><script>document.location.href=\'' . $url . '\';</script></head><body></body></html>';
+				echo '<html><head><meta http-equiv="content-type" content="text/html; charset=' . $document->getCharset() . '" />'
+					.'<script>document.location.href=\'' . htmlspecialchars($url) . '\';</script></head></html>';
 			}
 			elseif (!$moved and $navigator->isBrowser('konqueror'))
 			{
 				// WebKit browser (identified as konqueror by Joomla!) - Do not use 303, as it causes subresources
 				// reload (https://bugs.webkit.org/show_bug.cgi?id=38690)
-				echo '<html><head><meta http-equiv="refresh" content="0; url=' . $url .
-					'" /><meta http-equiv="content-type" content="text/html; charset=' . $document->getCharset() . '" /></head><body></body></html>';
+				echo '<html><head><meta http-equiv="content-type" content="text/html; charset=' . $document->getCharset() . '" />'
+					.'<meta http-equiv="refresh" content="0; url=' . htmlspecialchars($url) . '" /></head></html>';
 			}
 			else
 			{
@@ -681,9 +679,9 @@ class JApplication extends JObject
 			// validate that the user should be able to login (different to being authenticated)
 			// this permits authentication plugins blocking the user
 			$authorisations = $authenticate->authorise($response, $options);
-			foreach ($authorisation as $authorisation)
+			foreach ($authorisations as $authorisation)
 			{
-				$denied_states = Array(JAuthentication::STATUS_EXPIRED, JAuthentication::STATUS_DENIED);
+				$denied_states = array(JAuthentication::STATUS_EXPIRED, JAuthentication::STATUS_DENIED);
 				if (in_array($authorisation->status, $denied_states))
 				{
 					// Trigger onUserAuthorisationFailure Event.
@@ -787,9 +785,6 @@ class JApplication extends JObject
 	 */
 	public function logout($userid = null, $options = array())
 	{
-		// Initialise variables.
-		$retval = false;
-
 		// Get a user object from the JApplication.
 		$user = JFactory::getUser($userid);
 
@@ -978,9 +973,7 @@ class JApplication extends JObject
 	 */
 	protected function _createConfiguration($file)
 	{
-		jimport('joomla.registry.registry');
-
-		include_once $file;
+		JLoader::register('JConfig', $file);
 
 		// Create the JConfig object.
 		$config = new JConfig;
@@ -1049,10 +1042,9 @@ class JApplication extends JObject
 
 		// Check to see the the session already exists.
 		if (($this->getCfg('session_handler') != 'database' && ($time % 2 || $session->isNew()))
-			|| ($this->getCfg('session_handler') == 'database' && $session->isNew())
-		)
+			|| ($this->getCfg('session_handler') == 'database' && $session->isNew()))
 		{
-				$this->checkSession();
+			$this->checkSession();
 		}
 
 		return $session;
@@ -1077,7 +1069,7 @@ class JApplication extends JObject
 		$query = $db->getQuery(true);
 		$db->setQuery(
 			'SELECT ' . $query->qn('session_id') . ' FROM ' . $query->qn('#__session') . ' WHERE ' . $query->qn('session_id') . ' = ' .
-				$query->q($session->getId()),
+			$query->q($session->getId()),
 			0, 1
 		);
 		$exists = $db->loadResult();
@@ -1089,17 +1081,17 @@ class JApplication extends JObject
 			{
 				$db->setQuery(
 					'INSERT INTO ' . $query->qn('#__session') . ' (' . $query->qn('session_id') . ', ' . $query->qn('client_id') . ', ' .
-						$query->qn('time') . ')' . ' VALUES (' . $query->q($session->getId()) . ', ' . (int) $this->getClientId() . ', ' .
-						(int) time() . ')'
+					$query->qn('time') . ')' . ' VALUES (' . $query->q($session->getId()) . ', ' . (int) $this->getClientId() . ', ' .
+					(int) time() . ')'
 				);
 			}
 			else
 			{
 				$db->setQuery(
 					'INSERT INTO ' . $query->qn('#__session') . ' (' . $query->qn('session_id') . ', ' . $query->qn('client_id') . ', ' .
-						$query->qn('guest') . ', ' . $query->qn('time') . ', ' . $query->qn('userid') . ', ' . $query->qn('username') . ')' .
-						' VALUES (' . $query->q($session->getId()) . ', ' . (int) $this->getClientId() . ', ' . (int) $user->get('guest') . ', ' .
-						(int) $session->get('session.timer.start') . ', ' . (int) $user->get('id') . ', ' . $query->q($user->get('username')) . ')'
+					$query->qn('guest') . ', ' . $query->qn('time') . ', ' . $query->qn('userid') . ', ' . $query->qn('username') . ')' .
+					' VALUES (' . $query->q($session->getId()) . ', ' . (int) $this->getClientId() . ', ' . (int) $user->get('guest') . ', ' .
+					(int) $session->get('session.timer.start') . ', ' . (int) $user->get('id') . ', ' . $query->q($user->get('username')) . ')'
 				);
 			}
 

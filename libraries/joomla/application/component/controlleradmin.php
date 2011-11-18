@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.application.component.controller');
 
@@ -149,7 +149,7 @@ class JControllerAdmin extends JController
 	}
 
 	/**
-	 * Method to publish a list of taxa
+	 * Method to publish a list of items
 	 *
 	 * @return  void
 	 *
@@ -161,7 +161,6 @@ class JControllerAdmin extends JController
 		JRequest::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		$session = JFactory::getSession();
-		$registry = $session->get('registry');
 
 		// Get items to publish from the request.
 		$cid = JRequest::getVar('cid', array(), '', 'array');
@@ -192,11 +191,11 @@ class JControllerAdmin extends JController
 				{
 					$ntext = $this->text_prefix . '_N_ITEMS_PUBLISHED';
 				}
-				else if ($value == 0)
+				elseif ($value == 0)
 				{
 					$ntext = $this->text_prefix . '_N_ITEMS_UNPUBLISHED';
 				}
-				else if ($value == 2)
+				elseif ($value == 2)
 				{
 					$ntext = $this->text_prefix . '_N_ITEMS_ARCHIVED';
 				}
@@ -215,7 +214,7 @@ class JControllerAdmin extends JController
 	/**
 	 * Changes the order of one or more records.
 	 *
-	 * @return  void
+	 * @return  boolean  True on success
 	 *
 	 * @since   11.1
 	 */
@@ -225,7 +224,6 @@ class JControllerAdmin extends JController
 		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Initialise variables.
-		$user = JFactory::getUser();
 		$ids = JRequest::getVar('cid', null, 'post', 'array');
 		$inc = ($this->getTask() == 'orderup') ? -1 : +1;
 
@@ -250,7 +248,7 @@ class JControllerAdmin extends JController
 	/**
 	 * Method to save the submitted ordering values for records.
 	 *
-	 * @return  void
+	 * @return  boolean  True on success
 	 *
 	 * @since   11.1
 	 */
@@ -292,7 +290,7 @@ class JControllerAdmin extends JController
 	/**
 	 * Check in of one or more records.
 	 *
-	 * @return  void
+	 * @return  boolean  True on success
 	 *
 	 * @since   11.1
 	 */
@@ -302,7 +300,6 @@ class JControllerAdmin extends JController
 		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Initialise variables.
-		$user = JFactory::getUser();
 		$ids = JRequest::getVar('cid', null, 'post', 'array');
 
 		$model = $this->getModel();

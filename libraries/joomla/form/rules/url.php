@@ -10,7 +10,6 @@
 defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.form.formrule');
-jimport('joomla.string.string');
 
 /**
  * Form Rule class for the Joomla Platform.
@@ -75,9 +74,8 @@ class JFormRuleUrl extends JFormRule
 		}
 		// For some schemes here must be two slashes.
 		if (($urlScheme == 'http' || $urlScheme == 'https' || $urlScheme == 'ftp' || $urlScheme == 'sftp' || $urlScheme == 'gopher'
-						|| $urlScheme == 'wais' || $urlScheme == 'gopher' || $urlScheme == 'prospero' || $urlScheme == 'telnet')
-						&& ((substr($value, strlen($urlScheme), 3)) !== '://')
-		)
+			|| $urlScheme == 'wais' || $urlScheme == 'gopher' || $urlScheme == 'prospero' || $urlScheme == 'telnet')
+			&& ((substr($value, strlen($urlScheme), 3)) !== '://'))
 		{
 			return false;
 		}

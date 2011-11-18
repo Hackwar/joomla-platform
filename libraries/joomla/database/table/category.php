@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.database.tablenested');
 
@@ -24,8 +24,6 @@ class JTableCategory extends JTableNested
 	 * Constructor
 	 *
 	 * @param   database  &$db  A database connector object
-	 *
-	 * @return  JTableCategory
 	 *
 	 * @since   11.1
 	 */
@@ -193,7 +191,7 @@ class JTableCategory extends JTableNested
 	}
 
 	/**
-	 * Overriden JTable::store to set created/modified and user id.
+	 * Overridden JTable::store to set created/modified and user id.
 	 *
 	 * @param   boolean  $updateNulls  True to update fields even if they are null.
 	 *
@@ -221,8 +219,7 @@ class JTableCategory extends JTableNested
 		// Verify that the alias is unique
 		$table = JTable::getInstance('Category', 'JTable');
 		if ($table->load(array('alias' => $this->alias, 'parent_id' => $this->parent_id, 'extension' => $this->extension))
-			&& ($table->id != $this->id || $this->id == 0)
-		)
+			&& ($table->id != $this->id || $this->id == 0))
 		{
 
 			$this->setError(JText::_('JLIB_DATABASE_ERROR_CATEGORY_UNIQUE_ALIAS'));
