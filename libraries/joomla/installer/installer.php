@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
@@ -33,7 +33,7 @@ class JInstaller extends JAdapter
 	protected $_paths = array();
 
 	/**
-	 * True if packakge is an upgrade
+	 * True if package is an upgrade
 	 *
 	 * @var    boolean
 	 * @since  11.1
@@ -105,9 +105,13 @@ class JInstaller extends JAdapter
 	protected $redirect_url = null;
 
 	/**
+	 * @var    JInstaller  JInstaller instance container.
+	 * @since  11.3
+	 */
+	protected static $instance;
+
+	/**
 	 * Constructor
-	 *
-	 * @return  JInstaller
 	 *
 	 * @since   11.1
 	 */
@@ -126,9 +130,7 @@ class JInstaller extends JAdapter
 	 */
 	public static function getInstance()
 	{
-		static $instance;
-
-		if (!isset($instance))
+		if (!isset(self::$instance))
 		{
 			$instance = new JInstaller;
 		}
@@ -345,7 +347,7 @@ class JInstaller extends JAdapter
 
 					// Remove the entry from the #__extensions table
 					$query->delete($db->quoteName('#__extensions'));
-					$query->where($db->quoteName('extension_id').' = ' . (int) $step['id']);
+					$query->where($db->quoteName('extension_id') . ' = ' . (int) $step['id']);
 					$db->setQuery($query);
 					$stepval = $db->query();
 
@@ -566,7 +568,7 @@ class JInstaller extends JAdapter
 	public function discover()
 	{
 		$this->loadAllAdapters();
-		$results = Array();
+		$results = array();
 
 		foreach ($this->_adapters as $adapter)
 		{
@@ -1016,7 +1018,7 @@ class JInstaller extends JAdapter
 	 */
 	public function parseSchemaUpdates($schema, $eid)
 	{
-		$files = Array();
+		$files = array();
 		$update_count = 0;
 
 		// Ensure we have an XML element and a valid extension id
@@ -1552,7 +1554,7 @@ class JInstaller extends JAdapter
 
 					return false;
 				}
-				else if (($exists = file_exists($filedest)) && !$overwrite)
+				elseif (($exists = file_exists($filedest)) && !$overwrite)
 				{
 
 					// It's okay if the manifest already exists
@@ -1890,8 +1892,8 @@ class JInstaller extends JAdapter
 		}
 
 		// Check for a valid XML root tag.
-		// @todo: Remove backwards compatability in a future version
-		// Should be 'extension', but for backward compatability we will accept 'extension' or 'install'.
+		// @todo: Remove backwards compatibility in a future version
+		// Should be 'extension', but for backward compatibility we will accept 'extension' or 'install'.
 
 		// 1.5 uses 'install'
 		// 1.6 uses 'extension'
@@ -1948,7 +1950,7 @@ class JInstaller extends JAdapter
 	 * @param   array  $old_files  An array of JXMLElement objects that are the old files
 	 * @param   array  $new_files  An array of JXMLElement objects that are the new files
 	 *
-	 * @return  array  An array with the delete files and folders in findDeletedFiles[files] and findDeletedFiles[folders] resepctively
+	 * @return  array  An array with the delete files and folders in findDeletedFiles[files] and findDeletedFiles[folders] respectively
 	 *
 	 * @since   11.1
 	 */
@@ -1956,15 +1958,15 @@ class JInstaller extends JAdapter
 	{
 		// The magic find deleted files function!
 		// The files that are new
-		$files = Array();
+		$files = array();
 		// The folders that are new
-		$folders = Array();
+		$folders = array();
 		// The folders of the files that are new
-		$containers = Array();
+		$containers = array();
 		// A list of files to delete
-		$files_deleted = Array();
+		$files_deleted = array();
 		// A list of folders to delete
-		$folders_deleted = Array();
+		$folders_deleted = array();
 
 		foreach ($new_files as $file)
 		{
@@ -2035,7 +2037,7 @@ class JInstaller extends JAdapter
 			}
 		}
 
-		return Array('files' => $files_deleted, 'folders' => $folders_deleted);
+		return array('files' => $files_deleted, 'folders' => $folders_deleted);
 	}
 
 	/**
@@ -2056,7 +2058,7 @@ class JInstaller extends JAdapter
 		}
 
 		$data = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-		$retval = Array();
+		$retval = array();
 
 		foreach ($data as $row)
 		{

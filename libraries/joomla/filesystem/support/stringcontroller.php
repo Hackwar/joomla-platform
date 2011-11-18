@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 /**
  * String Controller
@@ -27,7 +27,7 @@ class JStringController
 	 */
 	function _getArray()
 	{
-		static $strings = Array();
+		static $strings = array();
 		return $strings;
 	}
 

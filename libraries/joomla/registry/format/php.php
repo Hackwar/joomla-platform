@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 /**
  * PHP class format handler for JRegistry
@@ -39,7 +39,7 @@ class JRegistryFormatPHP extends JRegistryFormat
 			{
 				$vars .= "\tpublic $" . $k . " = '" . addcslashes($v, '\\\'') . "';\n";
 			}
-			else if (is_array($v))
+			elseif (is_array($v))
 			{
 				$vars .= "\tpublic $" . $k . " = " . $this->getArrayString($v) . ";\n";
 			}

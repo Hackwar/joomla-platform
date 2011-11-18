@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.database.table');
 
@@ -24,8 +24,6 @@ class JTableUsergroup extends JTable
 	 * Constructor
 	 *
 	 * @param   database  &$db  A database connector object
-	 *
-	 * @return  JTableUsergroup
 	 *
 	 * @since   11.1
 	 */
@@ -51,7 +49,7 @@ class JTableUsergroup extends JTable
 		}
 
 		// Check for a duplicate parent_id, title.
-		// There is a unique index on the (parend_id, title) field in the table.
+		// There is a unique index on the (parent_id, title) field in the table.
 		$db = $this->getDbo();
 		$query = $db->getQuery(true)
 			->select('COUNT(title)')
@@ -139,7 +137,7 @@ class JTableUsergroup extends JTable
 	}
 
 	/**
-	 * Delete this object and its dependancies
+	 * Delete this object and its dependencies
 	 *
 	 * @param   integer  $oid  The primary key of the user group to delete.
 	 *
@@ -149,8 +147,6 @@ class JTableUsergroup extends JTable
 	 */
 	function delete($oid = null)
 	{
-		$k = $this->_tbl_key;
-
 		if ($oid)
 		{
 			$this->load($oid);

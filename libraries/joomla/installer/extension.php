@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die();
+defined('JPATH_PLATFORM') or die;
 
 /**
  * Extension object
@@ -87,8 +87,6 @@ class JExtension extends JObject
 	 * Constructor
 	 *
 	 * @param   JXMLElement  $element  A JXMLElement from which to load data from
-	 *
-	 * @return  JExtension
 	 *
 	 * @since  11.1
 	 */
